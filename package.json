@@ -1,0 +1,48 @@
+{
+  "name": "@mobx-form-constructor/core",
+  "version": "0.0.1-alpha.1",
+  "description": "core package",
+  "repository": "https://github.com/mobx-form-constructor/core.git",
+  "main": "./lib/index.js",
+  "module": "./module/index.js",
+  "jsnext:main": "./module/index.js",
+  "typings": "./typings/index.d.ts",
+  "author": "Alex <olefirenk@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build:module": "cross-env tsc --target es5 --outDir ./module",
+    "build:lib": "cross-env tsc --target es5 --module commonjs --outDir ./lib",
+    "build": "npm run clean && npm run build:module && npm run build:lib",
+    "clean": "rm -rf ./lib ./module ./typings",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  },
+  "peerDependencies": {
+    "mobx": "^4 || ^5"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.11",
+    "cross-env": "^5.2.0",
+    "jest": "^24.5.0",
+    "mobx": "^5.9.4",
+    "prettier": "^1.16.4",
+    "ts-jest": "^24.0.1",
+    "tslint": "^5.14.0",
+    "typescript": "^3.4.1"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  }
+}
