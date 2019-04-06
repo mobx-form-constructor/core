@@ -9,7 +9,7 @@
   "typings": "./typings/index.d.ts",
   "author": "Alex <olefirenk@gmail.com>",
   "license": "MIT",
-  "private": true,
+  "private": false,
   "scripts": {
     "build:module": "cross-env tsc --target es5 --outDir ./module",
     "build:lib": "cross-env tsc --target es5 --module commonjs --outDir ./lib",
