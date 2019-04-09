@@ -11,4 +11,5 @@ export interface IFormConfig<T, R extends any = {}> {
 
 export interface IModel {
   [$fields]: any
+  [key: string]: any
 }

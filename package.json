@@ -1,6 +1,6 @@
 {
   "name": "@mobx-form-constructor/core",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "description": "core package",
   "repository": "https://github.com/mobx-form-constructor/core.git",
   "main": "./lib/index.js",
@@ -9,7 +9,6 @@
   "typings": "./typings/index.d.ts",
   "author": "Alex <olefirenk@gmail.com>",
   "license": "MIT",
-  "private": false,
   "scripts": {
     "build:module": "cross-env tsc --target es5 --outDir ./module",
     "build:lib": "cross-env tsc --target es5 --module commonjs --outDir ./lib",

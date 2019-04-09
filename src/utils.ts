@@ -1,8 +1,9 @@
-import { IModel, IFieldConfig, ValidateType } from './interfaces'
+import { IModel, IFieldConfig, ValidateType, FieldsType } from './interfaces'
 import { Field } from './Field'
 import { FieldArray } from './FieldArray'
 import { $fields, IFieldArrayConfig } from './decorators'
 import { Form } from './Form'
+import DefaultModel from './Default.model'
 
 export function createFields(
   model: IModel,
@@ -14,7 +15,8 @@ export function createFields(
 
   for (const fieldName in model[$fields]) {
     if (Object.hasOwnProperty.call(model[$fields], fieldName)) {
-      const depth = $depth.concat(fieldName)
+      const depth = fieldName ? $depth.concat(fieldName) : $depth
+
       const field: any = model[$fields][fieldName]
       field.value = model[fieldName]
 
@@ -69,7 +71,7 @@ export function updateFieldValue(form: Form, value: any, depth: string[]) {
       key = result[1]
     }
 
-    if (array.length - 1 === index) {
+    if (array.length - index === 1) {
       acc[key] = value
     } else {
       if (result && !acc[key]) {
@@ -86,6 +88,7 @@ export function* validator(
   validate?: ValidateType | ValidateType[]
 ) {
   let valid: boolean = true
+
   if (validate) {
     try {
       this.validating = true
@@ -101,11 +104,11 @@ export function* validator(
       }
 
       if (error) {
-        this.setError(error)
+        this.error = error
         valid = false
       } else {
         valid = true
-        this.setError('')
+        this.error = ''
       }
 
       this.validating = false
@@ -115,4 +118,50 @@ export function* validator(
   }
 
   return valid
+}
+
+export type ValidatorsType = Array<() => Promise<boolean> | boolean>
+
+export function composeValidators(
+  fields: FieldsType<any>,
+  validators: ValidatorsType = []
+) {
+  for (const key in fields) {
+    if (Object.prototype.hasOwnProperty.call(fields, key)) {
+      const field = fields[key]
+
+      if (field instanceof Field) {
+        validators.push(field.validate)
+      }
+
+      if (field instanceof FieldArray) {
+        validators.push(field.validate)
+        if (field.model instanceof DefaultModel) {
+          for (const f of field.value) {
+            validators.push(f[''].validate)
+          }
+        } else {
+          for (const f of field.value) {
+            validators.push(...composeValidators(f as FieldsType<any>))
+          }
+        }
+      }
+    }
+  }
+
+  return validators
+}
+
+export function* formValidator(this: Form) {
+  let valid = true
+
+  for (const v of this.validators) {
+    const isValidField: boolean = yield v()
+
+    if (!isValidField) {
+      valid = false
+    }
+  }
+
+  this.valid = valid
 }

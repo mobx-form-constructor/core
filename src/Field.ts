@@ -1,4 +1,4 @@
-import { action, observable, flow } from 'mobx'
+import { action, observable, flow, computed } from 'mobx'
 
 import { IFieldConfig } from './interfaces'
 import { Form } from './Form'
@@ -18,8 +18,23 @@ export class Field<T = any, M = any> {
   @observable
   public validating = false
 
+  @computed
+  public get valid() {
+    return !this.error
+  }
+
+  @computed
+  public get invalid() {
+    return !this.valid
+  }
+
+  @computed
+  public get key() {
+    return this.depth.join('.')
+  }
+
   @action
-  public validate: () => Promise<string>
+  public validate: () => Promise<boolean>
 
   public form: Form<M>
 
@@ -31,7 +46,8 @@ export class Field<T = any, M = any> {
     }
     this.form = form
     this.depth = depth
-    this.validate = flow(validator.bind(this, field.validate))
+
+    this.validate = action(flow(validator.bind(this, field.validate)))
   }
 
   @action
@@ -39,7 +55,7 @@ export class Field<T = any, M = any> {
     this.value = e.target.value
     updateFieldValue(this.form, this.value, this.depth)
     this.touched = true
-    this.validate()
+    this.form.validate()
   }
 
   @action

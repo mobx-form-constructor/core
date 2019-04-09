@@ -3,13 +3,22 @@ import { fieldArray } from '../decorators'
 
 import Hobby from './Hobby'
 
+function required({ value }: any) {
+  return !value ? 'Required' : ''
+}
+
+function minLength(length: number) {
+  return ({ value }: any) =>
+    value.length < length ? `Min length ${length}` : ''
+}
+
 describe('simple example', () => {
   test('correct form values', () => {
     class UserFormModel {
-      @field()
+      @field({ validate: [required, minLength(3)] })
       login = 'alex'
 
-      @field()
+      @field({ validate: [required, minLength(10)] })
       password = 'password'
 
       @fieldArray({ model: Hobby })
@@ -26,11 +35,15 @@ describe('simple example', () => {
       }
     })
 
+    form.fields.emails.map(item => {
+      item.onChange({ target: { value: 'test' } })
+    })
+
     expect(form.values).toEqual({
       login: 'Alex',
       password: 'Password',
       hobbies: [{ hobbyId: 1, hobbyName: 'dev' }],
-      emails: ['olefirenk@gmail.com']
+      emails: ['test']
     })
   })
 })
