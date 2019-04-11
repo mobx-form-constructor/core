@@ -62,6 +62,7 @@ export class Field<T = any, M = any> {
   public onBlur = () => {
     this.touched = true
     this.active = false
+    this.form.validate()
   }
 
   @action
