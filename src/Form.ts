@@ -70,11 +70,13 @@ export class Form<T extends any = {}, R extends any = {}> {
   }
   // private didChange?: (form: Form<T>) => any
 
-  constructor(FormModel: ModelConstructorType<T>, config: IFormConfig<T, R>) {
-    this.initialValues = config.initialValues
-    this.onSubmit = config.onSubmit
-    this.onSubmitSuccess = config.onSubmitSuccess
-    this.onSubmitFail = config.onSubmitFail
+  constructor(FormModel: ModelConstructorType<T>, config?: IFormConfig<T, R>) {
+    if (config) {
+      this.initialValues = config.initialValues
+      this.onSubmit = config.onSubmit
+      this.onSubmitSuccess = config.onSubmitSuccess
+      this.onSubmitFail = config.onSubmitFail
+    }
 
     const model = new FormModel() as IModel & T
     this.fields = createFields(model, this.initialValues, this) as FieldsType<T>

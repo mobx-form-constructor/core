@@ -20,8 +20,11 @@ export function createFields(
       const field: any = model[$fields][fieldName]
       field.value = model[fieldName]
 
-      if (initialValues && initialValues[fieldName] !== undefined) {
-        field.value = initialValues[fieldName]
+      if (initialValues) {
+        const value = fieldName ? initialValues[fieldName] : initialValues
+        if (value !== undefined) {
+          field.value = value
+        }
       }
 
       if (
@@ -61,7 +64,7 @@ export function createFields(
   return fields
 }
 
-const isArrayKey = /\[(\d+)\]/
+export const isArrayKey = /\[(\d+)\]/
 
 export function updateFieldValue(form: Form, value: any, depth: string[]) {
   depth.reduce((acc: any, key, index, array) => {

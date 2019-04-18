@@ -2,7 +2,7 @@ import { action, observable, flow, computed } from 'mobx'
 
 import { IFieldConfig } from './interfaces'
 import { Form } from './Form'
-import { updateFieldValue, validator } from './utils'
+import { updateFieldValue, validator, isArrayKey } from './utils'
 
 export class Field<T = any, M = any> {
   @observable
@@ -30,7 +30,12 @@ export class Field<T = any, M = any> {
 
   @computed
   public get key() {
-    return this.depth.join('.')
+    return this.depth.reduce((acc: string, item) => {
+      if (isArrayKey.test(item)) {
+        return acc + item
+      }
+      return acc + '.' + item
+    }, '')
   }
 
   @action
