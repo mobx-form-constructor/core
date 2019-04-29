@@ -2,22 +2,14 @@ import { action, observable, flow, computed } from 'mobx'
 
 import { IFieldConfig } from './interfaces'
 import { Form } from './Form'
-import { updateFieldValue, validator, isArrayKey } from './utils'
+import {
+  updateFieldValue,
+  validator,
+  isArrayKey,
+  createNormalizer
+} from './utils'
 
 export class Field<T = any, M = any> {
-  @observable
-  public value: T = ('' as any) as T
-  @observable
-  public active = false
-  @observable
-  public touched = false
-  @observable
-  public visited = false
-  @observable
-  public error = ''
-  @observable
-  public validating = false
-
   @computed
   public get valid() {
     return !this.error
@@ -37,6 +29,18 @@ export class Field<T = any, M = any> {
       return acc + '.' + item
     }, '')
   }
+  @observable
+  public value: T = ('' as any) as T
+  @observable
+  public active = false
+  @observable
+  public touched = false
+  @observable
+  public visited = false
+  @observable
+  public error = ''
+  @observable
+  public validating = false
 
   @action
   public validate: () => Promise<boolean>
@@ -44,6 +48,10 @@ export class Field<T = any, M = any> {
   public form: Form<M>
 
   private depth: string[]
+
+  private didChange?: (value: T, field: Field<T>) => any
+
+  private normalize: (value: T, field: this) => T
 
   constructor(field: IFieldConfig<T>, form: Form<M>, depth: string[]) {
     if (typeof field.value !== 'undefined') {
@@ -53,14 +61,24 @@ export class Field<T = any, M = any> {
     this.depth = depth
 
     this.validate = action(flow(validator.bind(this, field.validate)))
+    this.normalize = createNormalizer(field.normalize)
+    this.didChange = field.didChange
   }
 
   @action
   public onChange = (e: any) => {
-    this.value = e.target.value
+    this.value = this.normalize(e.target.value, this)
     updateFieldValue(this.form, this.value, this.depth)
     this.touched = true
     this.form.validate()
+
+    if (this.didChange) {
+      this.didChange(this.value, this)
+    }
+
+    if (this.form.didChange) {
+      this.form.didChange(this.key, this.value, this.form)
+    }
   }
 
   @action

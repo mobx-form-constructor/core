@@ -7,6 +7,10 @@ function required({ value }: any) {
   return !value ? 'Required' : ''
 }
 
+function trim() {
+  return (value: any) => value.trim()
+}
+
 function minLength(length: number) {
   return ({ value }: any) =>
     value.length < length ? `Min length ${length}` : ''
@@ -17,7 +21,7 @@ describe('simple example', () => {
     @field({ validate: [required, minLength(3)] })
     login = 'alex'
 
-    @field({ validate: [required, minLength(10)] })
+    @field({ validate: [required, minLength(10)], normalize: [trim()] })
     password = 'password'
 
     @fieldArray({ model: Hobby })
@@ -75,5 +79,28 @@ describe('simple example', () => {
         item => item.value === 'olefirenk+1@gmail.com'
       )
     ).not.toBe(-1)
+  })
+
+  test('Field normalize', () => {
+    const form = new Form(UserFormModel)
+
+    form.fields.password.onChange({ target: { value: ' testvalue ' } })
+
+    expect(form.fields.password.value).toBe('testvalue')
+    expect(form.values.password).toBe('testvalue')
+  })
+
+  test('Form reset', () => {
+    const form = new Form(UserFormModel)
+
+    form.fields.password.onChange({ target: { value: 'Password' } })
+
+    expect(form.fields.password.value).toBe('Password')
+    expect(form.values.password).toBe('Password')
+
+    form.reset()
+
+    expect(form.fields.password.value).toBe('password')
+    expect(form.values.password).toBe('password')
   })
 })

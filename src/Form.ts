@@ -11,6 +11,10 @@ import {
 export type ModelConstructorType<T extends any = any> = new () => T
 
 export class Form<T extends any = {}, R extends any = {}> {
+  @computed
+  public get validators(): ValidatorsType {
+    return composeValidators(this.fields)
+  }
   public fields: FieldsType<T>
   @observable
   public values: T = {} as T
@@ -57,18 +61,22 @@ export class Form<T extends any = {}, R extends any = {}> {
   @observable
   public valid = true
 
+  @computed
+  public get invalid() {
+    return !this.valid
+  }
+
   @action
   public validate = flow(formValidator.bind(this))
+  public error: any = ''
+
+  public didChange?: (key: string, value: any, form: Form<T>) => any
 
   private onSubmit?: (form: Form<T>) => Promise<R>
   private onSubmitSuccess?: (result: R, form: Form<T>) => any
   private onSubmitFail?: (error: R, form: Form<T>) => any
 
-  @computed
-  public get validators(): ValidatorsType {
-    return composeValidators(this.fields)
-  }
-  // private didChange?: (form: Form<T>) => any
+  private model: IModel & T
 
   constructor(FormModel: ModelConstructorType<T>, config?: IFormConfig<T, R>) {
     if (config) {
@@ -76,9 +84,33 @@ export class Form<T extends any = {}, R extends any = {}> {
       this.onSubmit = config.onSubmit
       this.onSubmitSuccess = config.onSubmitSuccess
       this.onSubmitFail = config.onSubmitFail
+      this.didChange = config.didChange
     }
 
-    const model = new FormModel() as IModel & T
-    this.fields = createFields(model, this.initialValues, this) as FieldsType<T>
+    this.model = new FormModel() as IModel & T
+    this.fields = createFields(
+      this.model,
+      this.initialValues,
+      this
+    ) as FieldsType<T>
+  }
+
+  public reset = () => {
+    this.values = {} as T
+    this.error = ''
+    this.valid = true
+    this.submitFailed = false
+    this.submitted = false
+    this.submitting = false
+
+    this.fields = createFields(
+      this.model,
+      this.initialValues,
+      this
+    ) as FieldsType<T>
+  }
+
+  public setError = (error: any) => {
+    this.error = error
   }
 }

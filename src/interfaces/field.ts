@@ -8,7 +8,7 @@ export interface IFieldConfig<T = any, M = any> {
   value: T
   validate?: Array<ValidateType<T, M>> | ValidateType<T, M>
   normalize?: Array<NormalizeType<T, M>> | NormalizeType<T, M>
-  didChange?: (field: Field<T, M>) => any
+  didChange?: (value: T, field: Field<T, M>) => any
   didFocus?: (field: Field<T, M>) => any
   didBlur?: (field: Field<T, M>) => any
 }

@@ -1,4 +1,10 @@
-import { IModel, IFieldConfig, ValidateType, FieldsType } from './interfaces'
+import {
+  IModel,
+  IFieldConfig,
+  ValidateType,
+  FieldsType,
+  NormalizeType
+} from './interfaces'
 import { Field } from './Field'
 import { FieldArray } from './FieldArray'
 import { $fields, IFieldArrayConfig } from './decorators'
@@ -167,4 +173,24 @@ export function* formValidator(this: Form) {
   }
 
   this.valid = valid
+}
+
+export function createNormalizer<T, M>(
+  normalizer?: NormalizeType<T, M> | Array<NormalizeType<T, M>>
+) {
+  return (value: T, field: Field<T, M>) => {
+    if (normalizer) {
+      const normalizers = Array.isArray(normalizer) ? normalizer : [normalizer]
+
+      let $value: T = value
+
+      for (const fn of normalizers) {
+        $value = fn(value, field)
+      }
+
+      return $value
+    }
+
+    return value
+  }
 }
