@@ -1,6 +1,6 @@
 {
   "name": "@mobx-form-constructor/core",
-  "version": "0.0.1-alpha.6",
+  "version": "0.0.1-alpha.7",
   "description": "core package",
   "repository": "https://github.com/mobx-form-constructor/core.git",
   "main": "./lib/index.js",

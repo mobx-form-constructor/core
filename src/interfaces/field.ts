@@ -16,3 +16,7 @@ export interface IFieldConfig<T = any, M = any> {
 export type FieldsType<T> = {
   [P in keyof T]: T[P] extends any[] ? FieldArray<T[P][0], T> : Field<T[P], T>
 }
+
+export type ErrorsType<T> = {
+  [P in keyof T]: T[P] extends object | any[] ? ErrorsType<T[P]> : string
+}

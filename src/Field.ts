@@ -3,10 +3,11 @@ import { action, observable, flow, computed } from 'mobx'
 import { IFieldConfig } from './interfaces'
 import { Form } from './Form'
 import {
-  updateFieldValue,
+  setIn,
   validator,
   isArrayKey,
-  createNormalizer
+  createNormalizer,
+  shallowEqual
 } from './utils'
 
 export class Field<T = any, M = any> {
@@ -26,11 +27,19 @@ export class Field<T = any, M = any> {
       if (isArrayKey.test(item)) {
         return acc + item
       }
-      return acc + '.' + item
+      return acc ? acc + '.' + item : item
     }, '')
+  }
+  // @observable
+  // public autofilled
+
+  @computed
+  public get dirty() {
+    return !this.pristine
   }
   @observable
   public value: T = ('' as any) as T
+  public initial: T = ('' as any) as T
   @observable
   public active = false
   @observable
@@ -41,21 +50,24 @@ export class Field<T = any, M = any> {
   public error = ''
   @observable
   public validating = false
+  @observable
+  public pristine = true
 
   @action
   public validate: () => Promise<boolean>
 
   public form: Form<M>
 
-  private depth: string[]
+  public didChange?: (value: T, field: Field<T>) => any
 
-  private didChange?: (value: T, field: Field<T>) => any
+  public depth: string[]
 
   private normalize: (value: T, field: this) => T
 
   constructor(field: IFieldConfig<T>, form: Form<M>, depth: string[]) {
     if (typeof field.value !== 'undefined') {
       this.value = field.value
+      this.initial = field.value
     }
     this.form = form
     this.depth = depth
@@ -65,11 +77,56 @@ export class Field<T = any, M = any> {
     this.didChange = field.didChange
   }
 
+  public bind = () => ({
+    onChange: this.onChange,
+    onFocus: this.onFocus,
+    onBlur: this.onBlur,
+    value: this.value,
+    error: this.error
+  })
+
+  public bindCheckbox = () => ({
+    onChange: this.onChange,
+    onFocus: this.onFocus,
+    onBlur: this.onBlur,
+    error: this.error,
+    checked: this.value
+  })
+
+  public bindRadio = (value?: string) => ({
+    onChange: this.onChange,
+    onFocus: this.onFocus,
+    onBlur: this.onBlur,
+    error: this.error,
+    checked: String(this.value) === String(value),
+    value
+  })
+
   @action
   public onChange = (e: any) => {
-    this.value = this.normalize(e.target.value, this)
-    updateFieldValue(this.form, this.value, this.depth)
-    this.touched = true
+    let $value
+
+    if (e && e.target) {
+      $value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
+    } else {
+      $value = e
+    }
+
+    this.value = this.normalize($value, this)
+
+    setIn(this.form.values, this.value, this.depth)
+
+    this.pristine = shallowEqual(this.value, this.initial)
+    // if (change.object) {
+    //   this.form.pristineIdx++
+    // } else {
+    //   this.form.pristineIdx--
+    // }
+
+    if (!this.active) {
+      this.touched = true
+    }
+
     this.form.validate()
 
     if (this.didChange) {
@@ -91,18 +148,6 @@ export class Field<T = any, M = any> {
   @action
   public onFocus = () => {
     this.active = true
-  }
-
-  public bind = () => {
-    return {
-      onChange: this.onChange,
-      onFocus: this.onFocus,
-      onBlur: this.onBlur,
-      value: this.value
-    }
-  }
-
-  public setError = (value: string) => {
-    this.error = value
+    this.visited = true
   }
 }

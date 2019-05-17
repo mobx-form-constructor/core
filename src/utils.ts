@@ -48,7 +48,7 @@ export function createFields(
           if (typeof field.value === 'undefined') {
             field.value = ''
           }
-          updateFieldValue(form, field.value, depth)
+          setIn(form.values, field.value, depth)
           fields[fieldName] = new Field(field as IFieldConfig, form, depth)
         }
 
@@ -56,7 +56,7 @@ export function createFields(
           if (typeof field.value === 'undefined') {
             field.value = []
           }
-          updateFieldValue(form, field.value, depth)
+          setIn(form.values, field.value, depth)
           fields[fieldName] = new FieldArray(
             field as IFieldArrayConfig,
             form,
@@ -72,7 +72,11 @@ export function createFields(
 
 export const isArrayKey = /\[(\d+)\]/
 
-export function updateFieldValue(form: Form, value: any, depth: string[]) {
+export function setIn(
+  target: { [key: string]: any },
+  value: any,
+  depth: string[]
+) {
   depth.reduce((acc: any, key, index, array) => {
     const result = isArrayKey.exec(key)
 
@@ -89,7 +93,7 @@ export function updateFieldValue(form: Form, value: any, depth: string[]) {
 
       return acc[key]
     }
-  }, form.values)
+  }, target)
 }
 
 export function* validator(
@@ -114,10 +118,12 @@ export function* validator(
 
       if (error) {
         this.error = error
+        setIn(this.form.errors, error, this.depth)
         valid = false
       } else {
-        valid = true
         this.error = ''
+        setIn(this.form.errors, error, this.depth)
+        valid = true
       }
 
       this.validating = false
@@ -193,4 +199,31 @@ export function createNormalizer<T, M>(
 
     return value
   }
+}
+
+export function shallowEqual(a: any, b: any) {
+  if (a === b) {
+    return true
+  }
+
+  if (typeof a !== 'object' || !a || typeof b !== 'object' || !b) {
+    return false
+  }
+
+  const keysA = Object.keys(a)
+  const keysB = Object.keys(b)
+
+  if (keysA.length !== keysB.length) {
+    return false
+  }
+
+  const bHasOwnProperty = Object.prototype.hasOwnProperty.bind(b)
+
+  for (const key of keysA) {
+    if (!bHasOwnProperty(key) || a[key] !== b[key]) {
+      return false
+    }
+  }
+
+  return true
 }

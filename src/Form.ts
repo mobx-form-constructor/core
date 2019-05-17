@@ -1,6 +1,6 @@
 import { observable, flow, computed, action } from 'mobx'
 
-import { IFormConfig, FieldsType, IModel } from './interfaces'
+import { IFormConfig, FieldsType, IModel, ErrorsType } from './interfaces'
 import {
   createFields,
   composeValidators,
@@ -15,9 +15,17 @@ export class Form<T extends any = {}, R extends any = {}> {
   public get validators(): ValidatorsType {
     return composeValidators(this.fields)
   }
+
+  @computed
+  public get invalid() {
+    return !this.valid
+  }
   public fields: FieldsType<T>
   @observable
   public values: T = {} as T
+  @observable
+  public errors: Partial<ErrorsType<T>>
+
   public initialValues?: Partial<T>
 
   @observable
@@ -30,17 +38,23 @@ export class Form<T extends any = {}, R extends any = {}> {
   public submitFailed = false
 
   public handleSubmit = flow(
-    function* handleSubmit(this: Form<T>, e: any) {
-      e.preventDefault()
+    function* handleSubmit(this: Form<T>, e?: any) {
+      if (e && typeof e.preventDefault === 'function') {
+        e.preventDefault()
+      }
+
       const { onSubmit, onSubmitSuccess, onSubmitFail } = this
 
       if (!onSubmit) return
 
       try {
-        yield this.validate()
+        if (this.pristine) {
+          yield this.validate()
+        }
+
         if (!this.valid) {
           this.submitFailed = true
-          if (onSubmitFail) onSubmitFail({}, this)
+          if (onSubmitFail) onSubmitFail(this.errors, this)
           return
         }
         this.submitting = true
@@ -51,7 +65,7 @@ export class Form<T extends any = {}, R extends any = {}> {
         if (onSubmitSuccess) onSubmitSuccess(result, this)
       } catch (e) {
         this.submitting = false
-        this.submitted = true
+        this.submitted = false
         this.submitFailed = true
         if (onSubmitFail) onSubmitFail(e, this)
       }
@@ -62,8 +76,8 @@ export class Form<T extends any = {}, R extends any = {}> {
   public valid = true
 
   @computed
-  public get invalid() {
-    return !this.valid
+  public get pristine() {
+    return this.pristineIdx === 0
   }
 
   @action
@@ -71,6 +85,9 @@ export class Form<T extends any = {}, R extends any = {}> {
   public error: any = ''
 
   public didChange?: (key: string, value: any, form: Form<T>) => any
+
+  @observable
+  public pristineIdx = 0
 
   private onSubmit?: (form: Form<T>) => Promise<R>
   private onSubmitSuccess?: (result: R, form: Form<T>) => any
@@ -93,15 +110,23 @@ export class Form<T extends any = {}, R extends any = {}> {
       this.initialValues,
       this
     ) as FieldsType<T>
+
+    this.errors = {}
+  }
+
+  public dirty = () => {
+    return
   }
 
   public reset = () => {
     this.values = {} as T
+    this.errors = {}
     this.error = ''
     this.valid = true
     this.submitFailed = false
     this.submitted = false
     this.submitting = false
+    this.pristineIdx = 0
 
     this.fields = createFields(
       this.model,
