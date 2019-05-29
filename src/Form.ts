@@ -1,4 +1,5 @@
 import { observable, flow, computed, action } from 'mobx'
+import equal from 'fast-deep-equal'
 
 import { IFormConfig, FieldsType, IModel, ErrorsType } from './interfaces'
 import {
@@ -26,7 +27,7 @@ export class Form<T extends any = {}, R extends any = {}> {
   @observable
   public errors: Partial<ErrorsType<T>>
 
-  public initialValues?: Partial<T>
+  public initialValues: Partial<T> = {}
 
   @observable
   public submitting = false
@@ -77,7 +78,7 @@ export class Form<T extends any = {}, R extends any = {}> {
 
   @computed
   public get pristine() {
-    return this.pristineIdx === 0
+    return equal(this.initialValues, this.values)
   }
 
   @action
@@ -85,9 +86,6 @@ export class Form<T extends any = {}, R extends any = {}> {
   public error: any = ''
 
   public didChange?: (key: string, value: any, form: Form<T>) => any
-
-  @observable
-  public pristineIdx = 0
 
   private onSubmit?: (form: Form<T>) => Promise<R>
   private onSubmitSuccess?: (result: R, form: Form<T>) => any
@@ -97,7 +95,10 @@ export class Form<T extends any = {}, R extends any = {}> {
 
   constructor(FormModel: ModelConstructorType<T>, config?: IFormConfig<T, R>) {
     if (config) {
-      this.initialValues = config.initialValues
+      if (config.initialValues) {
+        this.initialValues = config.initialValues
+      }
+
       this.onSubmit = config.onSubmit
       this.onSubmitSuccess = config.onSubmitSuccess
       this.onSubmitFail = config.onSubmitFail
@@ -126,7 +127,6 @@ export class Form<T extends any = {}, R extends any = {}> {
     this.submitFailed = false
     this.submitted = false
     this.submitting = false
-    this.pristineIdx = 0
 
     this.fields = createFields(
       this.model,

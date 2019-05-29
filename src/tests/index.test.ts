@@ -115,6 +115,7 @@ describe('simple example', () => {
 
     expect(form.fields.password.value).toBe('password')
     expect(form.values.password).toBe('password')
+
     expect(form.pristine).toBe(true)
   })
 
@@ -178,11 +179,16 @@ describe('simple example', () => {
       onSubmitFail
     })
 
+    expect(form.pristine).toBe(true)
+    expect(form.valid).toBe(true)
+
     form.fields.login.onChange('')
     form.fields.password.onChange('')
 
+    await form.validate()
     await form.handleSubmit()
 
+    expect(form.pristine).toBe(false)
     expect(form.valid).toBe(false)
     expect(form.invalid).toBe(true)
     expect(form.submitted).toBe(false)

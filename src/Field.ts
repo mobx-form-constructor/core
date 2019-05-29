@@ -1,14 +1,9 @@
 import { action, observable, flow, computed } from 'mobx'
+import equal from 'fast-deep-equal'
 
 import { IFieldConfig } from './interfaces'
 import { Form } from './Form'
-import {
-  setIn,
-  validator,
-  isArrayKey,
-  createNormalizer,
-  shallowEqual
-} from './utils'
+import { setIn, validator, isArrayKey, createNormalizer } from './utils'
 
 export class Field<T = any, M = any> {
   @computed
@@ -50,8 +45,10 @@ export class Field<T = any, M = any> {
   public error = ''
   @observable
   public validating = false
-  @observable
-  public pristine = true
+  @computed
+  get pristine() {
+    return equal(this.value, this.initial)
+  }
 
   @action
   public validate: () => Promise<boolean>
@@ -115,13 +112,6 @@ export class Field<T = any, M = any> {
     this.value = this.normalize($value, this)
 
     setIn(this.form.values, this.value, this.depth)
-
-    this.pristine = shallowEqual(this.value, this.initial)
-    // if (change.object) {
-    //   this.form.pristineIdx++
-    // } else {
-    //   this.form.pristineIdx--
-    // }
 
     if (!this.active) {
       this.touched = true
