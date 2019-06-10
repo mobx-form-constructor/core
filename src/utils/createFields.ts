@@ -25,7 +25,7 @@ export function createFields(
         if (value !== undefined) {
           field.value = value
         } else {
-          initialValues[fieldName] = field.value
+          initialValues[fieldName] = field.value || ''
         }
       }
 
