@@ -180,6 +180,7 @@ describe('simple example', () => {
     })
 
     expect(form.pristine).toBe(true)
+    expect(form.dirty).toBe(false)
     expect(form.valid).toBe(true)
 
     form.fields.login.onChange('')
@@ -189,6 +190,7 @@ describe('simple example', () => {
     await form.handleSubmit()
 
     expect(form.pristine).toBe(false)
+    expect(form.dirty).toBe(true)
     expect(form.valid).toBe(false)
     expect(form.invalid).toBe(true)
     expect(form.submitted).toBe(false)

@@ -1,11 +1,12 @@
 import { action, observable, flow, computed } from 'mobx'
 import equal from 'fast-deep-equal'
 
+import { BaseField } from './BaseField'
 import { IFieldConfig } from './interfaces'
 import { Form } from './Form'
-import { setIn, validator, isArrayKey, createNormalizer } from './utils'
+import { setIn, validator, createNormalizer } from './utils'
 
-export class Field<T = any, M = any> {
+export class Field<T = any, M = any> extends BaseField {
   @computed
   public get valid() {
     return !this.error
@@ -16,15 +17,6 @@ export class Field<T = any, M = any> {
     return !this.valid
   }
 
-  @computed
-  public get key() {
-    return this.depth.reduce((acc: string, item) => {
-      if (isArrayKey.test(item)) {
-        return acc + item
-      }
-      return acc ? acc + '.' + item : item
-    }, '')
-  }
   // @observable
   // public autofilled
 
@@ -32,19 +24,27 @@ export class Field<T = any, M = any> {
   public get dirty() {
     return !this.pristine
   }
+
   @observable
   public value: T = ('' as any) as T
+
   public initial: T = ('' as any) as T
+
   @observable
   public active = false
+
   @observable
   public touched = false
+
   @observable
   public visited = false
+
   @observable
   public error = ''
+
   @observable
   public validating = false
+
   @computed
   get pristine() {
     return equal(this.value, this.initial)
@@ -57,11 +57,11 @@ export class Field<T = any, M = any> {
 
   public didChange?: (value: T, field: Field<T>) => any
 
-  public depth: string[]
-
   private normalize: (value: T, field: this) => T
 
   constructor(field: IFieldConfig<T>, form: Form<M>, depth: string[]) {
+    super()
+
     if (typeof field.value !== 'undefined') {
       this.value = field.value
       this.initial = field.value

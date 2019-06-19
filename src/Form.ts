@@ -21,9 +21,12 @@ export class Form<T extends any = {}, R extends any = {}> {
   public get invalid() {
     return !this.valid
   }
+
   public fields: FieldsType<T>
+
   @observable
   public values: T = {} as T
+
   @observable
   public errors: Partial<ErrorsType<T>>
 
@@ -52,7 +55,6 @@ export class Form<T extends any = {}, R extends any = {}> {
         if (this.pristine) {
           yield this.validate()
         }
-
         if (!this.valid) {
           this.submitFailed = true
           if (onSubmitFail) onSubmitFail(this.errors, this)
@@ -83,12 +85,16 @@ export class Form<T extends any = {}, R extends any = {}> {
 
   @action
   public validate = flow(formValidator.bind(this))
+
+  @observable
   public error: any = ''
 
   public didChange?: (key: string, value: any, form: Form<T>) => any
 
   private onSubmit?: (form: Form<T>) => Promise<R>
+
   private onSubmitSuccess?: (result: R, form: Form<T>) => any
+
   private onSubmitFail?: (error: R, form: Form<T>) => any
 
   private model: IModel & T
@@ -115,10 +121,12 @@ export class Form<T extends any = {}, R extends any = {}> {
     this.errors = {}
   }
 
-  public dirty = () => {
-    return
+  @computed
+  public get dirty() {
+    return !this.pristine
   }
 
+  @action
   public reset = () => {
     this.values = {} as T
     this.errors = {}
@@ -135,6 +143,7 @@ export class Form<T extends any = {}, R extends any = {}> {
     ) as FieldsType<T>
   }
 
+  @action
   public setError = (error: any) => {
     this.error = error
   }

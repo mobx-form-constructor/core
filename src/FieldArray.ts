@@ -1,5 +1,6 @@
 import { observable } from 'mobx'
 
+import { BaseField } from './BaseField'
 import { IFieldArrayConfig } from './decorators'
 import { createFields } from './utils'
 import { Form } from './Form'
@@ -9,20 +10,17 @@ import { Field } from './Field'
 
 type ValueType<T> = T extends object ? FieldsType<T> : Field<T>
 
-export class FieldArray<T extends any, M extends any> {
+export class FieldArray<T extends any, M extends any> extends BaseField {
   public form: Form<M>
 
   @observable
   public value: Array<ValueType<T>> = []
+
   public model: IModel = new DefaultModel() as any
 
-  private depth: string[]
-
-  public get key() {
-    return this.depth.join('.')
-  }
-
   constructor(field: IFieldArrayConfig, form: Form<M>, depth: string[]) {
+    super()
+
     this.form = form
     this.depth = depth
 
