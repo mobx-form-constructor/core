@@ -78,15 +78,13 @@ export class Field<T = any, M = any> extends BaseField {
     onChange: this.onChange,
     onFocus: this.onFocus,
     onBlur: this.onBlur,
-    value: this.value,
-    error: this.error
+    value: this.value
   })
 
   public bindCheckbox = () => ({
     onChange: this.onChange,
     onFocus: this.onFocus,
     onBlur: this.onBlur,
-    error: this.error,
     checked: this.value
   })
 
@@ -94,7 +92,6 @@ export class Field<T = any, M = any> extends BaseField {
     onChange: this.onChange,
     onFocus: this.onFocus,
     onBlur: this.onBlur,
-    error: this.error,
     checked: String(this.value) === String(value),
     value
   })
