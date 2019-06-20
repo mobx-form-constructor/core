@@ -5,6 +5,7 @@ import { BaseField } from './BaseField'
 import { IFieldConfig } from './interfaces'
 import { Form } from './Form'
 import { setIn, validator, createNormalizer } from './utils'
+import { getValue } from './utils/getValue'
 
 export class Field<T = any, M = any> extends BaseField {
   @computed
@@ -98,13 +99,7 @@ export class Field<T = any, M = any> extends BaseField {
 
   @action
   public onChange = (e: any) => {
-    let $value
-
-    if (e && e.target) {
-      $value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
-    } else {
-      $value = e
-    }
+    const $value = getValue(e)
 
     this.value = this.normalize($value, this)
 

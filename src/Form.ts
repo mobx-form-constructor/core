@@ -41,6 +41,8 @@ export class Form<T extends any = {}, R extends any = {}> {
   @observable
   public submitFailed = false
 
+  public name: string
+
   public handleSubmit = flow(
     function* handleSubmit(this: Form<T>, e?: any) {
       if (e && typeof e.preventDefault === 'function') {
@@ -100,9 +102,15 @@ export class Form<T extends any = {}, R extends any = {}> {
   private model: IModel & T
 
   constructor(FormModel: ModelConstructorType<T>, config?: IFormConfig<T, R>) {
+    this.name = FormModel.name
+
     if (config) {
       if (config.initialValues) {
         this.initialValues = config.initialValues
+      }
+
+      if (config.name) {
+        this.name = config.name
       }
 
       this.onSubmit = config.onSubmit
