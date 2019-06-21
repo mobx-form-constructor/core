@@ -22,6 +22,7 @@ export class Form<T extends any = {}, R extends any = {}> {
     return !this.valid
   }
 
+  @observable
   public fields: FieldsType<T>
 
   @observable
