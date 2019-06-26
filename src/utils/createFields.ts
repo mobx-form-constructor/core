@@ -34,7 +34,11 @@ export function createFields(
               initialValues[fieldName] = initial
             }
 
-            if (initial || form.valuesBehavior === 'keepEmpty') {
+            if (
+              initial ||
+              typeof initial === 'boolean' ||
+              form.valuesBehavior === 'keepEmpty'
+            ) {
               setIn(form.values, initial, depth)
             }
           }
