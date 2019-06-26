@@ -13,7 +13,11 @@ export function setIn(
     }
 
     if (array.length - index === 1) {
-      acc[key] = value
+      if (typeof value !== 'undefined') {
+        acc[key] = value
+      } else {
+        delete acc[key]
+      }
     } else {
       if (result && !acc[key]) {
         acc[key] = {}

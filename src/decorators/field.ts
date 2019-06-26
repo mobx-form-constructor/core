@@ -20,7 +20,9 @@ export function field<T, M>(config: Omit<IFieldConfig<T, M>, 'value'> = {}) {
   }
 }
 
-export function fieldArray(config: Omit<IFieldArrayConfig, 'value'> = {}) {
+export function fieldArray(
+  config: Omit<IFieldArrayConfig, 'value' | 'model'> = {}
+) {
   return (target: any, key: any) => {
     if (!Object.getOwnPropertyDescriptor(target, $fields)) {
       Object.defineProperty(target, $fields, {
@@ -32,7 +34,11 @@ export function fieldArray(config: Omit<IFieldArrayConfig, 'value'> = {}) {
         [key]: { ...config, type: 'fieldArray', name: key }
       }
     } else {
-      target[$fields][key] = { ...config, type: 'fieldArray', name: key }
+      target[$fields][key] = {
+        ...config,
+        type: 'fieldArray',
+        name: key
+      }
     }
   }
 }

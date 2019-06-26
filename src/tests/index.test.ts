@@ -1,47 +1,15 @@
 import { autorun } from 'mobx'
 
-import { field, Form } from '../'
-import { fieldArray } from '../decorators'
 import { Field } from '../Field'
+import { Form } from '../Form'
 
-import Hobby from './Hobby'
-
-function required({ value }: any) {
-  return !value ? 'Required' : ''
-}
-
-function trim() {
-  return (value: any) => value.trim()
-}
-
-function minLength(length: number) {
-  return ({ value }: any) =>
-    value.length < length ? `Min length ${length}` : ''
-}
+import UserFormModel from './UserForm.model'
 
 describe('simple example', () => {
-  class UserFormModel {
-    @field({ validate: [required, minLength(3)] })
-    login = 'alex'
-
-    @field({ validate: [required, minLength(8)], normalize: [trim()] })
-    password = 'password'
-
-    @fieldArray({ model: Hobby })
-    hobbies: Hobby[] = [{ hobbyId: 1, hobbyName: 'dev' }]
-
-    @fieldArray()
-    emails: string[] = ['olefirenk@gmail.com']
-
-    @field()
-    employed = true
-
-    @field()
-    sause = 'ketchup'
-  }
-
   test('initialize from model', () => {
-    const form = new Form(UserFormModel)
+    const form = new Form(UserFormModel, {
+      name: 'UserForm'
+    })
 
     expect(form.values).toEqual({
       login: 'alex',
@@ -51,6 +19,7 @@ describe('simple example', () => {
       employed: true,
       sause: 'ketchup'
     })
+    expect(form.name).toBe('UserForm')
   })
 
   test('initialValues should override model default values', () => {

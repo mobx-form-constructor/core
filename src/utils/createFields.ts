@@ -1,7 +1,9 @@
-import { IModel, IFieldConfig } from '../interfaces'
+import { IModel } from '../interfaces'
 import { Form } from '../Form'
 import { Field } from '../Field'
-import { $fields, FieldArray, IFieldArrayConfig } from '..'
+import { $fields, FieldArray } from '..'
+// import FieldArrayType from '../FieldArrayType'
+import DefaultModel from '../Default.model'
 
 import { setIn } from './setIn'
 
@@ -16,48 +18,57 @@ export function createFields(
   for (const fieldName in model[$fields]) {
     if (Object.hasOwnProperty.call(model[$fields], fieldName)) {
       const depth = fieldName ? $depth.concat(fieldName) : $depth
+      const fieldConfig: any = model[$fields][fieldName]
 
-      const field: any = model[$fields][fieldName]
-      field.value = model[fieldName]
+      switch (fieldConfig.type) {
+        case 'field': {
+          const initial =
+            typeof initialValues[fieldName] !== 'undefined'
+              ? initialValues[fieldName]
+              : model[fieldName] || ''
 
-      if (initialValues) {
-        const value = fieldName ? initialValues[fieldName] : initialValues
-        if (value !== undefined) {
-          field.value = value
-        } else {
-          initialValues[fieldName] = field.value || ''
-        }
-      }
+          model[fieldName] = initial
 
-      if (
-        typeof model[fieldName] === 'object' &&
-        !Array.isArray(model[fieldName])
-      ) {
-        fields[fieldName] = createFields(
-          model[fieldName],
-          field.value,
-          form,
-          depth
-        )
-      } else {
-        if (field.type === 'field') {
-          if (typeof field.value === 'undefined') {
-            field.value = ''
+          if (fieldName) {
+            if (!initialValues[fieldName]) {
+              initialValues[fieldName] = initial
+            }
+
+            if (initial || form.valuesBehavior === 'keepEmpty') {
+              setIn(form.values, initial, depth)
+            }
           }
-          setIn(form.values, field.value, depth)
-          fields[fieldName] = new Field(field as IFieldConfig, form, depth)
-        }
 
-        if (field.type === 'fieldArray') {
-          if (typeof field.value === 'undefined') {
-            field.value = []
-          }
-          setIn(form.values, field.value, depth)
-          fields[fieldName] = new FieldArray(
-            field as IFieldArrayConfig,
+          fields[fieldName] = new Field(
+            { ...fieldConfig, value: initial },
             form,
             depth
           )
+
+          break
+        }
+
+        case 'fieldArray': {
+          // const fieldArray: FieldArrayType<any> = fieldConfig
+
+          const initial =
+            typeof initialValues[fieldName] !== 'undefined'
+              ? initialValues[fieldName]
+              : model[fieldName].initial || []
+
+          initialValues[fieldName] = initial
+
+          setIn(form.values, initial, depth)
+
+          fields[fieldName] = new FieldArray(
+            {
+              model: model[fieldName].model || DefaultModel,
+              value: initial
+            },
+            form,
+            depth
+          )
+          break
         }
       }
     }

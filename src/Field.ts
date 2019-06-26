@@ -103,7 +103,11 @@ export class Field<T = any, M = any> extends BaseField {
 
     this.value = this.normalize($value, this)
 
-    setIn(this.form.values, this.value, this.depth)
+    if (this.value || this.form.valuesBehavior === 'keepEmpty') {
+      setIn(this.form.values, this.value, this.depth)
+    } else {
+      setIn(this.form.values, undefined, this.depth)
+    }
 
     if (!this.active) {
       this.touched = true

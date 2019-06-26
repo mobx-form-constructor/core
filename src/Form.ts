@@ -1,7 +1,13 @@
 import { observable, flow, computed, action } from 'mobx'
 import equal from 'fast-deep-equal'
 
-import { IFormConfig, FieldsType, IModel, ErrorsType } from './interfaces'
+import {
+  IFormConfig,
+  FieldsType,
+  IModel,
+  ErrorsType,
+  ValuesType
+} from './interfaces'
 import {
   createFields,
   composeValidators,
@@ -22,16 +28,26 @@ export class Form<T extends any = {}, R extends any = {}> {
     return !this.valid
   }
 
+  @computed
+  public get pristine() {
+    return equal(this.initialValues, this.values)
+  }
+
+  @computed
+  public get dirty() {
+    return !this.pristine
+  }
+
   @observable
   public fields: FieldsType<T>
 
   @observable
-  public values: T = {} as T
+  public values: ValuesType<T> = {} as ValuesType<T>
 
   @observable
   public errors: Partial<ErrorsType<T>>
 
-  public initialValues: Partial<T> = {}
+  public initialValues: Partial<ValuesType<T>> = {}
 
   @observable
   public submitting = false
@@ -81,11 +97,6 @@ export class Form<T extends any = {}, R extends any = {}> {
   @observable
   public valid = true
 
-  @computed
-  public get pristine() {
-    return equal(this.initialValues, this.values)
-  }
-
   @action
   public validate = flow(formValidator.bind(this))
 
@@ -93,6 +104,8 @@ export class Form<T extends any = {}, R extends any = {}> {
   public error: any = ''
 
   public didChange?: (key: string, value: any, form: Form<T>) => any
+
+  public valuesBehavior: 'keepEmpty' | 'removeEmpty' = 'keepEmpty'
 
   private onSubmit?: (form: Form<T>) => Promise<R>
 
@@ -114,6 +127,10 @@ export class Form<T extends any = {}, R extends any = {}> {
         this.name = config.name
       }
 
+      if (config.valuesBehavior) {
+        this.valuesBehavior = config.valuesBehavior
+      }
+
       this.onSubmit = config.onSubmit
       this.onSubmitSuccess = config.onSubmitSuccess
       this.onSubmitFail = config.onSubmitFail
@@ -130,14 +147,9 @@ export class Form<T extends any = {}, R extends any = {}> {
     this.errors = {}
   }
 
-  @computed
-  public get dirty() {
-    return !this.pristine
-  }
-
   @action
   public reset = () => {
-    this.values = {} as T
+    this.values = {} as ValuesType<T>
     this.errors = {}
     this.error = ''
     this.valid = true
