@@ -131,6 +131,7 @@ export class Field<T = any, M = any> extends BaseField {
   @action
   public onBlur = () => {
     this.touched = true
+    this.form.touched = true
     this.active = false
     this.form.validate()
   }

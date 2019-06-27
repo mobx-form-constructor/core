@@ -71,9 +71,10 @@ export class Form<T extends any = {}, R extends any = {}> {
       if (!onSubmit) return
 
       try {
-        if (this.pristine) {
+        if (this.pristine || !this.touched) {
           yield this.validate()
         }
+        this.touched = true
         if (!this.valid) {
           this.submitFailed = true
           if (onSubmitFail) onSubmitFail(this.errors, this)
@@ -106,6 +107,9 @@ export class Form<T extends any = {}, R extends any = {}> {
   public didChange?: (key: string, value: any, form: Form<T>) => any
 
   public valuesBehavior: 'keepEmpty' | 'removeEmpty' = 'keepEmpty'
+
+  @observable
+  public touched = false
 
   private onSubmit?: (form: Form<T>) => Promise<R>
 
@@ -148,7 +152,7 @@ export class Form<T extends any = {}, R extends any = {}> {
   }
 
   @action
-  public reset = () => {
+  public reset = (initialValues = this.initialValues) => {
     this.values = {} as ValuesType<T>
     this.errors = {}
     this.error = ''
@@ -157,11 +161,7 @@ export class Form<T extends any = {}, R extends any = {}> {
     this.submitted = false
     this.submitting = false
 
-    this.fields = createFields(
-      this.model,
-      this.initialValues,
-      this
-    ) as FieldsType<T>
+    this.fields = createFields(this.model, initialValues, this) as FieldsType<T>
   }
 
   @action
