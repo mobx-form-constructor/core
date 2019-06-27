@@ -1,5 +1,6 @@
 export * from './Form'
 export * from './Field'
 export * from './FieldArray'
+export * from './FieldArrayType'
 export * from './decorators'
 export * from './interfaces'

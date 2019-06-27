@@ -1,7 +1,6 @@
 /node_modules
 /typings
-/lib
-/module
+/build
 /yarn-error.log
 .DS_Store
 /coverage
