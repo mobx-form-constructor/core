@@ -160,6 +160,7 @@ export class Form<T extends any = {}, R extends any = {}> {
     this.submitFailed = false
     this.submitted = false
     this.submitting = false
+    this.touched = false
 
     this.fields = createFields(this.model, initialValues, this) as FieldsType<T>
   }
