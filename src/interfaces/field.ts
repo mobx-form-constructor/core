@@ -1,6 +1,6 @@
 import { Field } from '../Field'
 import { FieldArray } from '../FieldArray'
-import FieldArrayType from '../FieldArrayType'
+import { FieldArrayType } from '../FieldArrayType'
 
 import { ValidateType } from './validate'
 import { NormalizeType } from './normalize'

@@ -2,7 +2,6 @@ import { IModel } from '../interfaces'
 import { Form } from '../Form'
 import { Field } from '../Field'
 import { $fields, FieldArray } from '..'
-// import FieldArrayType from '../FieldArrayType'
 import DefaultModel from '../Default.model'
 
 import { setIn } from './setIn'
@@ -51,8 +50,6 @@ export function createFields(
         }
 
         case 'fieldArray': {
-          // const fieldArray: FieldArrayType<any> = fieldConfig
-
           const initial =
             typeof initialValues[fieldName] !== 'undefined'
               ? initialValues[fieldName]

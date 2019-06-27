@@ -4,7 +4,7 @@ type ModelType<T> = T extends ModelConstructorType ? InstanceType<T> : string
 
 type InitialType<T> = Array<ModelType<T>>
 
-class FieldArrayType<M extends any> {
+export class FieldArrayType<M extends any> {
   type: 'fieldArray'
   initial: InitialType<M>
   model: M
@@ -20,5 +20,3 @@ class FieldArrayType<M extends any> {
     }
   }
 }
-
-export default FieldArrayType

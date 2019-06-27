@@ -1,5 +1,5 @@
 import { field, fieldArray } from '../decorators'
-import FieldArrayType from '../FieldArrayType'
+import { FieldArrayType } from '../FieldArrayType'
 
 import { minLength, required, trim } from './utils'
 import Hobby from './Hobby.model'
