@@ -27,8 +27,6 @@ export function createFields(
               ? initialValues[fieldName]
               : model[fieldName] || ''
 
-          model[fieldName] = initial
-
           if (fieldName) {
             if (!initialValues[fieldName]) {
               initialValues[fieldName] = initial
