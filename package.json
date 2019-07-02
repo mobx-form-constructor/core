@@ -1,6 +1,7 @@
 {
   "name": "@mobx-form-constructor/core",
-  "version": "0.0.1-alpha.19",
+  "version": "0.0.1-alpha.20",
+  "homepage": "https://mobx-form-constructor.netlify.com",
   "description": "core package",
   "repository": "https://github.com/mobx-form-constructor/core.git",
   "main": "./index.js",
@@ -45,6 +46,14 @@
       "node"
     ]
   },
+  "keywords": [
+    "react",
+    "bindings",
+    "mobx-form",
+    "mobx",
+    "form",
+    "mobx-form-constructor"
+  ],
   "dependencies": {
     "fast-deep-equal": "^2.0.1"
   }

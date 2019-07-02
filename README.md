@@ -4,4 +4,6 @@
 [![npm downloads](https://img.shields.io/npm/dm/@mobx-form-constructor/core.svg?style=flat-square)](http://npm-stat.com/charts.html?package=mobx-form-constructor/core)
 [![Build Status](https://travis-ci.org/mobx-form-constructor/core.svg?branch=master)](https://travis-ci.org/@mobx-form-constructor/core)
 
-> soon
+## Core package
+
+[Documentation](https://mobx-form-constructor.netlify.com)
