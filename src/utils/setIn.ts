@@ -7,11 +7,9 @@ export function setIn(
 ) {
   depth.reduce((acc: any, key, index, array) => {
     const result = isArrayKey.exec(key)
-
     if (result) {
       key = result[1]
     }
-
     if (array.length - index === 1) {
       if (typeof value !== 'undefined') {
         acc[key] = value
@@ -19,7 +17,7 @@ export function setIn(
         delete acc[key]
       }
     } else {
-      if (result && !acc[key]) {
+      if (result && acc.length - 1 !== Number(key)) {
         acc[key] = {}
       }
 
