@@ -63,6 +63,32 @@ describe('simple example', () => {
     ).not.toBe(-1)
   })
 
+  test('FieldArray: validate', async () => {
+    const form = new Form(UserFormModel, {
+      initialValues: {
+        hobbies: []
+      }
+    })
+
+    form.fields.hobbies.push({ hobbyId: 0, hobbyName: '' })
+
+    await form.validate()
+
+    expect(form.errors).toEqual({
+      emails: [],
+      hobbies: [{ hobbyId: 'Required', hobbyName: 'Required' }]
+    })
+
+    form.fields.hobbies.push({ hobbyId: 1, hobbyName: 'dev' })
+
+    await form.validate()
+
+    expect(form.errors).toEqual({
+      emails: [],
+      hobbies: [{ hobbyId: 'Required', hobbyName: 'Required' }]
+    })
+  })
+
   test('Field normalize', () => {
     const form = new Form(UserFormModel)
 
@@ -168,7 +194,7 @@ describe('simple example', () => {
 
     expect(onSubmit).not.toBeCalledWith(form)
     expect(onSubmitFail).toBeCalledWith(
-      { login: 'Required', password: 'Required' },
+      { login: 'Required', password: 'Required', emails: [], hobbies: [{}] },
       form
     )
 

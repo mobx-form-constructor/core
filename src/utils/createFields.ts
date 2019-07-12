@@ -59,6 +59,8 @@ export function createFields(
 
           setIn(form.values, initial, depth)
 
+          setIn(form.errors, [], depth)
+
           fields[fieldName] = new FieldArray(
             {
               model: model[fieldName].model || DefaultModel,

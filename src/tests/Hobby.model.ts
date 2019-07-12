@@ -1,10 +1,12 @@
 import { field } from '../decorators'
 
+import { required } from './utils'
+
 class Hobby {
-  @field()
+  @field({ validate: required })
   hobbyId = 1
 
-  @field()
+  @field({ validate: required })
   hobbyName = 'dev'
 }
 

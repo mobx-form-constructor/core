@@ -45,7 +45,7 @@ export class Form<T extends any = {}, R extends any = {}> {
   public values: ValuesType<T> = {} as ValuesType<T>
 
   @observable
-  public errors: Partial<ErrorsType<T>>
+  public errors: Partial<ErrorsType<T>> = {}
 
   public initialValues: Partial<ValuesType<T>> = {}
 
@@ -147,8 +147,6 @@ export class Form<T extends any = {}, R extends any = {}> {
       this.initialValues,
       this
     ) as FieldsType<T>
-
-    this.errors = {}
   }
 
   @action

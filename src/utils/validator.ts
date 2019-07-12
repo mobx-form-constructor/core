@@ -29,7 +29,7 @@ export function* validator(
         valid = false
       } else {
         this.error = ''
-        setIn(this.form.errors, error, this.depth)
+        setIn(this.form.errors, undefined, this.depth)
         valid = true
       }
 
