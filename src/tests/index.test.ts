@@ -85,7 +85,7 @@ describe('simple example', () => {
 
     expect(form.errors).toEqual({
       emails: [],
-      hobbies: [{ hobbyId: 'Required', hobbyName: 'Required' }]
+      hobbies: [{ hobbyId: 'Required', hobbyName: 'Required' }, {}]
     })
   })
 
