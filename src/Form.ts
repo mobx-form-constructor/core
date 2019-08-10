@@ -1,19 +1,8 @@
 import { observable, flow, computed, action } from 'mobx'
 import equal from 'fast-deep-equal'
 
-import {
-  IFormConfig,
-  FieldsType,
-  IModel,
-  ErrorsType,
-  ValuesType
-} from './interfaces'
-import {
-  createFields,
-  composeValidators,
-  ValidatorsType,
-  formValidator
-} from './utils'
+import { IFormConfig, FieldsType, IModel, ErrorsType, ValuesType } from './interfaces'
+import { createFields, composeValidators, ValidatorsType, formValidator } from './utils'
 
 export type ModelConstructorType<T extends any = any> = new () => T
 
@@ -142,11 +131,7 @@ export class Form<T extends any = {}, R extends any = {}> {
     }
 
     this.model = new FormModel() as IModel & T
-    this.fields = createFields(
-      this.model,
-      this.initialValues,
-      this
-    ) as FieldsType<T>
+    this.fields = createFields(this.model, this.initialValues, this) as FieldsType<T>
   }
 
   @action

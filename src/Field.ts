@@ -7,7 +7,7 @@ import { Form } from './Form'
 import { setIn, validator, createNormalizer } from './utils'
 import { getValue } from './utils/getValue'
 
-export class Field<T = any, M = any> extends BaseField {
+export class Field<T = any, M = any> extends BaseField<M> {
   @computed
   public get valid() {
     return !this.error
@@ -40,21 +40,10 @@ export class Field<T = any, M = any> extends BaseField {
   @observable
   public visited = false
 
-  @observable
-  public error = ''
-
-  @observable
-  public validating = false
-
   @computed
   get pristine() {
     return equal(this.value, this.initial)
   }
-
-  @action
-  public validate: () => Promise<boolean>
-
-  public form: Form<M>
 
   public didChange?: (value: T, field: Field<T>) => any
 
@@ -103,11 +92,7 @@ export class Field<T = any, M = any> extends BaseField {
 
     this.value = this.normalize($value, this)
 
-    if (
-      this.value ||
-      typeof this.value === 'boolean' ||
-      this.form.valuesBehavior === 'keepEmpty'
-    ) {
+    if (this.value || typeof this.value === 'boolean' || this.form.valuesBehavior === 'keepEmpty') {
       setIn(this.form.values, this.value, this.depth)
     } else {
       setIn(this.form.values, undefined, this.depth)

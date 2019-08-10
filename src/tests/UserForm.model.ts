@@ -1,10 +1,11 @@
 import { field, fieldArray } from '../decorators'
 import { FieldArrayType } from '../FieldArrayType'
 
-import { minLength, required, trim } from './utils'
+import { minLength, required, trim, willThrowAnError } from './utils'
 import Hobby from './Hobby.model'
+import EmailsModel from './Emails.model'
 
-class UserFormModel {
+class UserFormModel extends EmailsModel {
   @field({ validate: [required, minLength(3)] })
   login = 'alex'
 
@@ -14,14 +15,14 @@ class UserFormModel {
   @fieldArray()
   hobbies = new FieldArrayType(Hobby, [{ hobbyId: 1, hobbyName: 'dev' }])
 
-  @fieldArray()
-  emails = new FieldArrayType(['olefirenk@gmail.com'])
-
-  @field()
+  @field({ validate: willThrowAnError })
   employed = true
 
   @field()
   sause = 'ketchup'
+
+  @field()
+  flavor: string[]
 }
 
 export default UserFormModel

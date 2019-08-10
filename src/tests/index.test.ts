@@ -2,6 +2,7 @@ import { autorun } from 'mobx'
 
 import { Field } from '../Field'
 import { Form } from '../Form'
+// import { $fields } from '../decorators'
 
 import UserFormModel from './UserForm.model'
 
@@ -11,14 +12,7 @@ describe('simple example', () => {
       name: 'UserForm'
     })
 
-    expect(form.values).toEqual({
-      login: 'alex',
-      password: 'password',
-      hobbies: [{ hobbyId: 1, hobbyName: 'dev' }],
-      emails: ['olefirenk@gmail.com'],
-      employed: true,
-      sause: 'ketchup'
-    })
+    expect(form.values).toMatchSnapshot()
     expect(form.name).toBe('UserForm')
   })
 
@@ -32,14 +26,7 @@ describe('simple example', () => {
       }
     })
 
-    expect(form.values).toEqual({
-      login: 'Alex',
-      password: 'Password',
-      hobbies: [{ hobbyId: 1, hobbyName: 'Dev' }],
-      emails: ['Olefirenk@gmail.com'],
-      employed: true,
-      sause: 'ketchup'
-    })
+    expect(form.values).toMatchSnapshot()
   })
 
   test('Field: onChange', () => {
@@ -56,11 +43,7 @@ describe('simple example', () => {
 
     form.fields.emails.push('olefirenk+1@gmail.com')
 
-    expect(
-      form.fields.emails.value.find(
-        item => item.value === 'olefirenk+1@gmail.com'
-      )
-    ).not.toBe(-1)
+    expect(form.fields.emails.value.find(item => item.value === 'olefirenk+1@gmail.com')).not.toBe(-1)
   })
 
   test('FieldArray: validate', async () => {
@@ -193,10 +176,7 @@ describe('simple example', () => {
     expect(form.submitting).toBe(false)
 
     expect(onSubmit).not.toBeCalledWith(form)
-    expect(onSubmitFail).toBeCalledWith(
-      { login: 'Required', password: 'Required', emails: [], hobbies: [{}] },
-      form
-    )
+    expect(onSubmitFail).toBeCalledWith({ login: 'Required', password: 'Required', emails: [], hobbies: [{}] }, form)
 
     expect(form.errors.login).toBe('Required')
     expect(form.errors.password).toBe('Required')
@@ -294,9 +274,7 @@ describe('simple example', () => {
   test('Field checkbox', () => {
     const form = new Form(UserFormModel)
 
-    let checkbox: ReturnType<
-      typeof form.fields.employed.bindCheckbox
-    > = form.fields.employed.bindCheckbox()
+    let checkbox: ReturnType<typeof form.fields.employed.bindCheckbox> = form.fields.employed.bindCheckbox()
 
     autorun(() => {
       checkbox = { ...form.fields.employed.bindCheckbox() }
@@ -312,13 +290,9 @@ describe('simple example', () => {
   test('Field radio', () => {
     const form = new Form(UserFormModel)
 
-    let mustardRadio: ReturnType<
-      typeof form.fields.sause.bindRadio
-    > = form.fields.sause.bindRadio('mustard')
+    let mustardRadio: ReturnType<typeof form.fields.sause.bindRadio> = form.fields.sause.bindRadio('mustard')
 
-    let ketchupRadio: ReturnType<
-      typeof form.fields.sause.bindRadio
-    > = form.fields.sause.bindRadio('ketchup')
+    let ketchupRadio: ReturnType<typeof form.fields.sause.bindRadio> = form.fields.sause.bindRadio('ketchup')
 
     autorun(() => {
       mustardRadio = { ...form.fields.sause.bindRadio('mustard') }
@@ -335,5 +309,72 @@ describe('simple example', () => {
 
     expect(form.fields.sause.active).toBe(false)
     expect(form.fields.sause.touched).toBe(true)
+  })
+
+  test('Field select-multiple', () => {
+    const form = new Form(UserFormModel, {
+      initialValues: {
+        flavor: []
+      }
+    })
+
+    expect(form.fields.flavor.value).toEqual([])
+
+    form.fields.flavor.onChange({
+      target: {
+        options: [{ selected: true, value: 'grapefruit' }, { selected: false, value: 'lime' }],
+        type: 'select-multiple'
+      }
+    })
+
+    expect(form.fields.flavor.value).toEqual(['grapefruit'])
+
+    form.fields.flavor.onChange({
+      target: {
+        type: 'select-multiple'
+      }
+    })
+
+    expect(form.fields.flavor.value).toEqual([])
+  })
+
+  test('FieldArray validate array length', async () => {
+    const form = new Form(UserFormModel, {
+      initialValues: {
+        emails: []
+      }
+    })
+
+    await form.validate()
+
+    expect(form.valid).toBe(false)
+    expect(form.fields.emails.error).toBe('Required')
+  })
+
+  test('Form: keepEmpty', () => {
+    const form = new Form(UserFormModel, { valuesBehavior: 'removeEmpty' })
+
+    form.fields.password.onChange('password')
+    expect(form.values.password).toBe('password')
+
+    form.fields.password.onChange('')
+    expect(form.values.password).not.toBeDefined()
+  })
+
+  test('FieldArray map', () => {
+    const form = new Form(UserFormModel, {
+      initialValues: {
+        emails: ['olefirenk@gmail.com'],
+        hobbies: [
+          {
+            hobbyId: 1,
+            hobbyName: 'Dev'
+          }
+        ]
+      }
+    })
+
+    expect(form.fields.emails.map(item => item)[0].key).toBe('emails[0]')
+    expect(form.fields.hobbies.map(item => item.hobbyId)[0].key).toBe('hobbies[0].hobbyId')
   })
 })

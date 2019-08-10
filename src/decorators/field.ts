@@ -1,11 +1,10 @@
-import { Omit, IFieldConfig } from '../interfaces'
-import { ModelConstructorType } from '../Form'
+import { Omit, IFieldConfig, IFieldArrayConfig } from '../interfaces'
 
 export const $fields = Symbol('fields')
 
 export function field<T, M>(config: Omit<IFieldConfig<T, M>, 'value'> = {}) {
   return (target: any, key: any) => {
-    if (!Object.getOwnPropertyDescriptor(target, $fields)) {
+    if (!target[$fields]) {
       Object.defineProperty(target, $fields, {
         configurable: true,
         enumerable: true,
@@ -20,11 +19,9 @@ export function field<T, M>(config: Omit<IFieldConfig<T, M>, 'value'> = {}) {
   }
 }
 
-export function fieldArray(
-  config: Omit<IFieldArrayConfig, 'value' | 'model'> = {}
-) {
+export function fieldArray(config: Omit<IFieldArrayConfig, 'value' | 'model'> = {}) {
   return (target: any, key: any) => {
-    if (!Object.getOwnPropertyDescriptor(target, $fields)) {
+    if (!target[$fields]) {
       Object.defineProperty(target, $fields, {
         configurable: true,
         enumerable: true,
@@ -41,9 +38,4 @@ export function fieldArray(
       }
     }
   }
-}
-
-export interface IFieldArrayConfig {
-  model?: ModelConstructorType | string | number
-  value: any[]
 }

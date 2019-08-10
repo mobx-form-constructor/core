@@ -1,12 +1,10 @@
-import { Field } from '../Field'
 import { ValidateType } from '../interfaces'
+import { Field } from '../Field'
+import { FieldArray } from '../FieldArray'
 
 import { setIn } from './setIn'
 
-export function* validator(
-  this: Field,
-  validate?: ValidateType | ValidateType[]
-) {
+export function* validator(this: Field | FieldArray, validate?: ValidateType | ValidateType[], putError = true) {
   let valid: boolean = true
 
   if (validate) {
@@ -25,11 +23,15 @@ export function* validator(
 
       if (error) {
         this.error = error
-        setIn(this.form.errors, error, this.depth)
+        if (putError) {
+          setIn(this.form.errors, error, this.depth)
+        }
         valid = false
       } else {
         this.error = ''
-        setIn(this.form.errors, undefined, this.depth)
+        if (putError) {
+          setIn(this.form.errors, undefined, this.depth)
+        }
         valid = true
       }
 

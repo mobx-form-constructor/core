@@ -1,9 +1,12 @@
-import { computed } from 'mobx'
+import { computed, observable, action } from 'mobx'
 
 import { isArrayKey } from './utils'
+import { Form } from './Form'
 
-export abstract class BaseField {
+export abstract class BaseField<F = {}> {
   public depth: string[]
+
+  public form: Form<F>
 
   @computed
   public get key() {
@@ -14,4 +17,13 @@ export abstract class BaseField {
       return acc ? acc + '.' + item : item
     }, '')
   }
+
+  @observable
+  public error = ''
+
+  @observable
+  public validating = false
+
+  @action
+  public validate: () => Promise<boolean>
 }

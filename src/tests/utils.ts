@@ -1,5 +1,15 @@
 export function required({ value }: any) {
-  return !value ? 'Required' : ''
+  const errorMessage = 'Required'
+
+  if (Array.isArray(value)) {
+    return !value.length ? errorMessage : ''
+  }
+
+  return !value ? errorMessage : ''
+}
+
+export function willThrowAnError() {
+  return Promise.reject(new Error('Ooops'))
 }
 
 export function trim() {
@@ -7,6 +17,5 @@ export function trim() {
 }
 
 export function minLength(length: number) {
-  return ({ value }: any) =>
-    value.length < length ? `Min length ${length}` : ''
+  return ({ value }: any) => (value.length < length ? `Min length ${length}` : '')
 }

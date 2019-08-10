@@ -5,10 +5,7 @@ import { FieldsType } from '../interfaces'
 
 export type ValidatorsType = Array<() => Promise<boolean> | boolean>
 
-export function composeValidators(
-  fields: FieldsType<any>,
-  validators: ValidatorsType = []
-) {
+export function composeValidators(fields: FieldsType<any>, validators: ValidatorsType = []) {
   for (const key in fields) {
     if (Object.prototype.hasOwnProperty.call(fields, key)) {
       const field = fields[key]

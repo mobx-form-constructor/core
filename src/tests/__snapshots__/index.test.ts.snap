@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`simple example initialValues should override model default values 1`] = `
+Object {
+  "emails": Array [
+    "Olefirenk@gmail.com",
+  ],
+  "employed": true,
+  "flavor": "",
+  "hobbies": Array [
+    Object {
+      "hobbyId": 1,
+      "hobbyName": "Dev",
+    },
+  ],
+  "login": "Alex",
+  "password": "Password",
+  "sause": "ketchup",
+}
+`;
+
+exports[`simple example initialize from model 1`] = `
+Object {
+  "emails": Array [
+    "olefirenk@gmail.com",
+  ],
+  "employed": true,
+  "flavor": "",
+  "hobbies": Array [
+    Object {
+      "hobbyId": 1,
+      "hobbyName": "dev",
+    },
+  ],
+  "login": "alex",
+  "password": "password",
+  "sause": "ketchup",
+}
+`;

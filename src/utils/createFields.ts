@@ -6,12 +6,7 @@ import DefaultModel from '../Default.model'
 
 import { setIn } from './setIn'
 
-export function createFields(
-  model: IModel,
-  initialValues: any,
-  form: Form,
-  $depth: string[] = []
-) {
+export function createFields(model: IModel, initialValues: any, form: Form, $depth: string[] = []) {
   const fields = {}
 
   for (const fieldName in model[$fields]) {
@@ -22,38 +17,26 @@ export function createFields(
       switch (fieldConfig.type) {
         case 'field': {
           const initial =
-            typeof initialValues[fieldName] !== 'undefined'
-              ? initialValues[fieldName]
-              : model[fieldName] || ''
+            typeof initialValues[fieldName] !== 'undefined' ? initialValues[fieldName] : model[fieldName] || ''
 
           if (fieldName) {
             if (!initialValues[fieldName]) {
               initialValues[fieldName] = initial
             }
 
-            if (
-              initial ||
-              typeof initial === 'boolean' ||
-              form.valuesBehavior === 'keepEmpty'
-            ) {
+            if (initial || typeof initial === 'boolean' || form.valuesBehavior === 'keepEmpty') {
               setIn(form.values, initial, depth)
             }
           }
 
-          fields[fieldName] = new Field(
-            { ...fieldConfig, value: initial },
-            form,
-            depth
-          )
+          fields[fieldName] = new Field({ ...fieldConfig, value: initial }, form, depth)
 
           break
         }
 
         case 'fieldArray': {
           const initial =
-            typeof initialValues[fieldName] !== 'undefined'
-              ? initialValues[fieldName]
-              : model[fieldName].initial || []
+            typeof initialValues[fieldName] !== 'undefined' ? initialValues[fieldName] : model[fieldName].initial || []
 
           initialValues[fieldName] = initial
 
@@ -63,6 +46,7 @@ export function createFields(
 
           fields[fieldName] = new FieldArray(
             {
+              ...fieldConfig,
               model: model[fieldName].model || DefaultModel,
               value: initial
             },

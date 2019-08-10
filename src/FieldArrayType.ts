@@ -8,10 +8,7 @@ export class FieldArrayType<M extends any> {
   type: 'fieldArray'
   initial: InitialType<M>
   model: M
-  constructor(
-    modelOrInitial: M | InitialType<string>,
-    initial?: InitialType<M>
-  ) {
+  constructor(modelOrInitial: M | InitialType<M>, initial?: InitialType<M>) {
     if (Array.isArray(modelOrInitial)) {
       this.initial = modelOrInitial as InitialType<M>
     } else {

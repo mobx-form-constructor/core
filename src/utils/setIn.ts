@@ -1,10 +1,6 @@
 export const isArrayKey = /\[(\d+)\]/
 
-export function setIn(
-  target: { [key: string]: any },
-  value: any,
-  depth: string[]
-) {
+export function setIn(target: { [key: string]: any }, value: any, depth: string[]) {
   depth.reduce((acc: any, key, index, array) => {
     const result = isArrayKey.exec(key)
     if (result) {
