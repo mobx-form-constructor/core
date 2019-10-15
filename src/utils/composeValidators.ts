@@ -1,9 +1,11 @@
+import { CancellablePromise } from 'mobx/lib/api/flow'
+
 import { Field } from '../Field'
 import { FieldArray } from '../FieldArray'
 import DefaultModel from '../Default.model'
 import { FieldsType } from '../interfaces'
 
-export type ValidatorsType = Array<() => Promise<boolean> | boolean>
+export type ValidatorsType = Array<(a1?: never) => CancellablePromise<unknown>>
 
 export function composeValidators(fields: FieldsType<any>, validators: ValidatorsType = []) {
   for (const key in fields) {

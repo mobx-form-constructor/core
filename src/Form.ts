@@ -2,7 +2,7 @@ import { observable, flow, computed, action } from 'mobx'
 import equal from 'fast-deep-equal'
 
 import { IFormConfig, FieldsType, IModel, ErrorsType, ValuesType } from './interfaces'
-import { createFields, composeValidators, ValidatorsType, formValidator } from './utils'
+import { createFields, composeValidators, ValidatorsType, formValidator, setIn } from './utils'
 
 export type ModelConstructorType<T extends any = any> = new () => T
 
@@ -151,5 +151,13 @@ export class Form<T extends any = {}, R extends any = {}> {
   @action
   public setError = (error: any) => {
     this.error = error
+  }
+
+  public updateValue = (value: any, depth: string[]) => {
+    if (value || typeof value === 'boolean' || this.valuesBehavior === 'keepEmpty') {
+      setIn(this.values, value, depth)
+    } else {
+      setIn(this.values, undefined, depth)
+    }
   }
 }

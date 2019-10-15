@@ -1,4 +1,5 @@
 import { computed, observable, action } from 'mobx'
+import { CancellablePromise } from 'mobx/lib/api/flow'
 
 import { isArrayKey } from './utils'
 import { Form } from './Form'
@@ -25,5 +26,5 @@ export abstract class BaseField<F = {}> {
   public validating = false
 
   @action
-  public validate: () => Promise<boolean>
+  public validate: (a1?: never) => CancellablePromise<unknown>
 }

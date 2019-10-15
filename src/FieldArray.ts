@@ -13,6 +13,8 @@ export class FieldArray<T extends any = any, M extends any = any> extends BaseFi
   @observable
   public value: Array<ValueType<T>> = []
 
+  public initial: T[]
+
   public model: IModel
 
   constructor(field: IFieldArrayConfig<T, M>, form: Form<M>, depth: string[]) {
@@ -26,10 +28,16 @@ export class FieldArray<T extends any = any, M extends any = any> extends BaseFi
     this.model = new field.model()
 
     if (field.value.length) {
-      this.value = field.value.map((item, index) => this.createItem(item, String(index)))
+      this.value = field.value.map((item, index) => this.createItem(item, index))
+      this.initial = field.value
     } else {
+      this.initial = []
       this.value = []
     }
+  }
+
+  public push = (value: T) => {
+    return this.value.push(this.createItem(value, this.value.length))
   }
 
   public map = <U>(callbackfn: (value: ValueType<T>, index: number, array: Array<ValueType<T>>) => U): U[] => {
@@ -40,12 +48,17 @@ export class FieldArray<T extends any = any, M extends any = any> extends BaseFi
     }
   }
 
-  public push = (value: T) => {
-    return this.value.push(this.createItem(value, String(this.value.length)))
+  public unshift = (value: T) => {
+    return this.value.unshift(this.createItem(value, this.value.length))
   }
 
-  private createItem = (value: T, name: string): any => {
-    const depth = [...this.depth, `[${name}]`]
+  @action
+  public reset = (initial = this.initial) => {
+    this.value = initial.map((item, index) => this.createItem(item, index))
+  }
+
+  private createItem = (value: T, index: number): any => {
+    const depth = [...this.depth, `[${index}]`]
 
     return createFields(this.model, value, this.form, depth) as T
   }

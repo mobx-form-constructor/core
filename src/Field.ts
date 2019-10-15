@@ -26,6 +26,11 @@ export class Field<T = any, M = any> extends BaseField<M> {
     return !this.pristine
   }
 
+  @computed
+  get pristine() {
+    return equal(this.value, this.initial)
+  }
+
   @observable
   public value: T = ('' as any) as T
 
@@ -40,12 +45,11 @@ export class Field<T = any, M = any> extends BaseField<M> {
   @observable
   public visited = false
 
-  @computed
-  get pristine() {
-    return equal(this.value, this.initial)
-  }
-
   public didChange?: (value: T, field: Field<T>) => any
+
+  public didBlur?: (field: Field<T>) => any
+
+  public didFocus?: (field: Field<T>) => any
 
   private normalize: (value: T, field: this) => T
 
@@ -62,6 +66,8 @@ export class Field<T = any, M = any> extends BaseField<M> {
     this.validate = action(flow(validator.bind(this, field.validate)))
     this.normalize = createNormalizer(field.normalize)
     this.didChange = field.didChange
+    this.didBlur = field.didBlur
+    this.didFocus = field.didFocus
   }
 
   public bind = () => ({
@@ -92,11 +98,7 @@ export class Field<T = any, M = any> extends BaseField<M> {
 
     this.value = this.normalize($value, this)
 
-    if (this.value || typeof this.value === 'boolean' || this.form.valuesBehavior === 'keepEmpty') {
-      setIn(this.form.values, this.value, this.depth)
-    } else {
-      setIn(this.form.values, undefined, this.depth)
-    }
+    this.form.updateValue(this.value, this.depth)
 
     if (!this.active) {
       this.touched = true
@@ -104,13 +106,18 @@ export class Field<T = any, M = any> extends BaseField<M> {
 
     this.form.validate()
 
-    if (this.didChange) {
-      this.didChange(this.value, this)
-    }
+    this.notifyListeners()
+  }
 
-    if (this.form.didChange) {
-      this.form.didChange(this.key, this.value, this.form)
-    }
+  @action
+  public reset = (initial = this.initial) => {
+    this.value = initial
+    this.active = false
+    this.visited = false
+    this.touched = false
+    this.error = ''
+    this.form.updateValue(this.value, this.depth)
+    this.notifyListeners()
   }
 
   @action
@@ -119,11 +126,30 @@ export class Field<T = any, M = any> extends BaseField<M> {
     this.form.touched = true
     this.active = false
     this.form.validate()
+    if (this.didBlur) {
+      this.didBlur(this)
+    }
   }
 
   @action
   public onFocus = () => {
     this.active = true
     this.visited = true
+    if (this.didFocus) {
+      this.didFocus(this)
+    }
+  }
+
+  //
+  // refactor todo
+  //
+  public notifyListeners = () => {
+    if (this.didChange) {
+      this.didChange(this.value, this)
+    }
+
+    if (this.form.didChange) {
+      this.form.didChange(this.key, this.value, this.form)
+    }
   }
 }
