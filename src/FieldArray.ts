@@ -1,5 +1,6 @@
 import { observable, action, flow } from 'mobx'
 
+import { getIn } from './utils/getIn'
 import { BaseField } from './BaseField'
 import { createFields, validator } from './utils'
 import { Form } from './Form'
@@ -42,6 +43,13 @@ export class FieldArray<T extends any = any, M extends any = any> extends BaseFi
 
   public push = (value: T) => {
     return this.value.push(this.createItem(value, String(this.value.length)))
+  }
+
+  public remove = (index: number) => {
+    this.value.splice(index, 1)
+
+    const value: any = getIn(this.form.values, this.depth)
+    value.splice(index, 1)
   }
 
   private createItem = (value: T, name: string): any => {

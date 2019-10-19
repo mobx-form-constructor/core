@@ -2,18 +2,19 @@ export const isArrayKey = /\[(\d+)\]/
 
 export function setIn(target: { [key: string]: any }, value: any, depth: string[]) {
   depth.reduce((acc: any, key, index, array) => {
-    const result = isArrayKey.exec(key)
-    if (result) {
-      key = result[1]
+    const isArray = isArrayKey.exec(key)
+    if (isArray) {
+      key = isArray[1]
     }
-    if (array.length - index === 1) {
+
+    if (array.length - 1 === index) {
       if (typeof value !== 'undefined') {
         acc[key] = value
       } else {
         delete acc[key]
       }
     } else {
-      if (result && acc.length - 1 !== Number(key)) {
+      if (isArray && acc.length <= Number(key)) {
         acc[key] = {}
       }
 

@@ -369,6 +369,10 @@ describe('simple example', () => {
           {
             hobbyId: 1,
             hobbyName: 'Dev'
+          },
+          {
+            hobbyId: 2,
+            hobbyName: 'Smth'
           }
         ]
       }
@@ -376,5 +380,25 @@ describe('simple example', () => {
 
     expect(form.fields.emails.map(item => item)[0].key).toBe('emails[0]')
     expect(form.fields.hobbies.map(item => item.hobbyId)[0].key).toBe('hobbies[0].hobbyId')
+  })
+
+  test('FieldArray values should be consitent', () => {
+    const form = new Form(UserFormModel, {
+      initialValues: {
+        emails: ['olefirenk@gmail.com'],
+        hobbies: [
+          {
+            hobbyId: 1,
+            hobbyName: 'Dev'
+          },
+          {
+            hobbyId: 2,
+            hobbyName: 'Smth'
+          }
+        ]
+      }
+    })
+
+    expect(form.values.hobbies).toEqual(form.initialValues.hobbies)
   })
 })
